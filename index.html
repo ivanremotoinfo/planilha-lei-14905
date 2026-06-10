@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planilha Judicial — Lei 14.905/24 | SuporteADV</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0d0d0d; color: #e0e0e0; padding: 24px 16px; }
+  .container { max-width: 820px; margin: 0 auto; }
+
+  .header { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #222; }
+  h1 { font-size: 1.5rem; color: #008080; margin-bottom: 6px; }
+  .subtitle { font-size: 0.88rem; color: #888; line-height: 1.5; }
+  .brand { font-size: 0.78rem; margin-top: 8px; color: #555; }
+  .brand span.s { color: #8B00FF; font-weight: 700; }
+  .brand span.a { color: #008080; font-weight: 700; }
+
+  .lei-banner {
+    background: linear-gradient(135deg, #0a1a1a, #0d0d1a);
+    border: 1px solid #1a3a3a; border-left: 4px solid #008080;
+    border-radius: 10px; padding: 16px 20px; margin-bottom: 20px;
+  }
+  .lei-banner h2 { font-size: 0.95rem; color: #008080; margin-bottom: 8px; }
+  .lei-banner p { font-size: 0.82rem; color: #666; line-height: 1.7; }
+  .lei-banner .destaque { color: #00ff00; font-weight: 700; }
+
+  .card { background: #111; border-radius: 10px; border: 1px solid #222; border-left: 3px solid #8B00FF; padding: 20px 22px; margin-bottom: 14px; transition: border-left-color 0.2s; }
+  .card:hover { border-left-color: #008080; }
+  .card-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #008080; font-weight: 700; margin-bottom: 16px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
+  .field.full { grid-column: 1 / -1; }
+
+  .field label { display: block; font-size: 0.78rem; color: #888; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .field input, .field select {
+    width: 100%; padding: 9px 11px; border: 1.5px solid #333; border-radius: 6px;
+    font-size: 0.95rem; color: #fff; background: #1a1a1a; transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: #008080; box-shadow: 0 0 0 2px rgba(0,128,128,0.2); }
+  .field select option { background: #1a1a1a; }
+
+  /* Fases */
+  .fases { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 560px) { .fases { grid-template-columns: 1fr; } }
+  .fase-card {
+    background: #1a1a1a; border: 1.5px solid #333; border-radius: 8px;
+    padding: 12px 14px; cursor: pointer; transition: all 0.18s;
+  }
+  .fase-card:hover { border-color: #008080; }
+  .fase-card.ativo { border-color: #008080; background: #0a1a1a; }
+  .fase-card .fase-nome { font-size: 0.85rem; font-weight: 700; color: #ccc; margin-bottom: 4px; }
+  .fase-card .fase-desc { font-size: 0.72rem; color: #555; line-height: 1.4; }
+  .fase-card.ativo .fase-nome { color: #008080; }
+
+  .info-box { background: #0d1a1a; border: 1px solid #1a3a3a; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.82rem; color: #666; line-height: 1.6; }
+  .info-box b { color: #008080; }
+
+  /* Parcelas */
+  .parcela-row { display: grid; grid-template-columns: auto 1fr 1fr 36px; gap: 8px; align-items: end; margin-bottom: 8px; }
+  .num-badge { width: 28px; height: 36px; background: #1a1a1a; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: #555; font-weight: 700; flex-shrink: 0; }
+  .btn-add { background: transparent; color: #008080; border: 1.5px dashed #008080; padding: 8px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.18s; text-transform: uppercase; margin-bottom: 16px; width: 100%; }
+  .btn-add:hover { background: #0a1a1a; }
+  .btn-rem { background: #1a0a0a; border: 1px solid #3a1a1a; color: #ff4444; width: 36px; height: 36px; border-radius: 6px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+  button.calcular { background: #008080; color: #fff; border: none; padding: 10px 26px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.07em; cursor: pointer; transition: background 0.18s; text-transform: uppercase; margin-right: 10px; }
+  button.calcular:hover { background: #006666; box-shadow: 0 0 10px rgba(0,128,128,0.4); }
+  button.calcular:disabled { background: #333; color: #666; cursor: not-allowed; }
+  button.limpar { background: transparent; color: #555; border: 1.5px solid #333; padding: 10px 18px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+
+  .loading { display: none; align-items: center; gap: 8px; color: #008080; font-size: 0.85rem; margin-top: 10px; }
+  .loading.visible { display: flex; }
+  .spinner { width: 16px; height: 16px; border: 2px solid #333; border-top-color: #008080; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Resultado */
+  .resultado { background: #0a1a0a; border: 1px solid #1a4a1a; border-radius: 10px; padding: 20px 22px; margin-top: 14px; display: none; }
+  .resultado.visible { display: block; }
+  .resultado-titulo { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #008080; font-weight: 700; margin-bottom: 16px; }
+
+  .totais-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 560px) { .totais-grid { grid-template-columns: 1fr 1fr; } }
+  .res-item label { display: block; font-size: 0.72rem; color: #555; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .res-item .valor { font-size: 1rem; font-weight: 700; color: #00ff00; font-family: 'Courier New', monospace; }
+  .res-item .valor.grande { font-size: 1.45rem; }
+  .res-item .valor.sec { color: #888; font-size: 0.95rem; }
+
+  .divider { border: none; border-top: 1px solid #1a3a1a; margin: 14px 0; }
+
+  /* Fases resultado */
+  .fases-resultado { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .fase-res { background: #111; border-radius: 8px; border: 1px solid #1a3a1a; padding: 12px 14px; }
+  .fase-res .fr-titulo { font-size: 0.72rem; color: #008080; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
+  .fase-res .fr-item { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px; }
+  .fase-res .fr-item span:first-child { color: #555; }
+  .fase-res .fr-item span:last-child { color: #ccc; font-family: 'Courier New', monospace; font-weight: 700; }
+
+  .tabela-wrap { overflow-x: auto; margin-top: 14px; }
+  .tabela-wrap summary { cursor: pointer; color: #008080; font-size: 0.82rem; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 700px; }
+  th { text-align: right; color: #555; padding: 6px 8px; border-bottom: 1px solid #222; font-size: 0.68rem; text-transform: uppercase; white-space: nowrap; }
+  th:first-child { text-align: center; }
+  td { text-align: right; color: #999; padding: 6px 8px; border-bottom: 1px solid #1a1a1a; font-family: 'Courier New', monospace; font-size: 0.78rem; white-space: nowrap; }
+  td:first-child { text-align: center; font-family: inherit; color: #555; }
+  tr:hover td { background: #151515; }
+  td.dest { color: #00ff00; font-weight: 700; }
+  tr.total-row td { color: #fff; font-weight: 700; background: #0d1a0d; border-top: 1px solid #333; }
+
+  .erro { background: #1a0a0a; border: 1px solid #4a1a1a; border-radius: 8px; padding: 14px 16px; color: #ff6666; font-size: 0.88rem; margin-top: 14px; display: none; }
+  .erro.visible { display: block; }
+  .aviso { font-size: 0.72rem; color: #444; margin-top: 12px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Planilha Judicial — Lei 14.905/24</h1>
+    <p class="subtitle">Cálculo atualizado conforme a nova lei de juros legais. Aplica IPCA + juros diferenciados por fase processual.</p>
+    <p class="brand"><span class="s">suporte</span><span class="a">ADV</span>.br — Ferramentas para Advogados</p>
+  </div>
+
+  <div class="lei-banner">
+    <h2>⚖️ O que mudou com a Lei 14.905/24?</h2>
+    <p>
+      Vigente a partir de <span class="destaque">01/01/2025</span>, a lei unificou os juros legais no Brasil:
+      <br>• <span class="destaque">Correção monetária:</span> IPCA em todas as fases
+      <br>• <span class="destaque">Juros extrajudiciais:</span> SELIC acumulada desde o vencimento até a citação
+      <br>• <span class="destaque">Juros judiciais:</span> 1% ao mês (simples) da citação ao pagamento
+      <br>• <span class="destaque">Multa:</span> até 10% sobre o valor atualizado (definida na sentença)
+      <br>• Aplica-se a obrigações civis, comerciais e trabalhistas sem regra especial
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Fase do Cálculo</div>
+    <div class="fases" id="fases-grid">
+      <div class="fase-card ativo" id="fase-completo" onclick="setFase('completo')">
+        <div class="fase-nome">📋 Cálculo Completo</div>
+        <div class="fase-desc">Extrajudicial (SELIC) + Judicial (1% a.m.) + Multa. Cobre todo o período desde o vencimento.</div>
+      </div>
+      <div class="fase-card" id="fase-extrajudicial" onclick="setFase('extrajudicial')">
+        <div class="fase-nome">📄 Fase Extrajudicial</div>
+        <div class="fase-desc">Do vencimento à citação. IPCA + SELIC acumulada. Sem multa nesta fase.</div>
+      </div>
+      <div class="fase-card" id="fase-judicial" onclick="setFase('judicial')">
+        <div class="fase-nome">🏛️ Fase Judicial</div>
+        <div class="fase-desc">Da citação ao pagamento. IPCA + 1% ao mês simples + multa.</div>
+      </div>
+      <div class="fase-card" id="fase-execucao" onclick="setFase('execucao')">
+        <div class="fase-nome">⚡ Fase de Execução</div>
+        <div class="fase-desc">Após sentença. IPCA + SELIC + 1% a.m. + multa de 10% (art. 523 CPC).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Datas e Parâmetros</div>
+    <div class="info-box" id="info-fase">
+      <b>Cálculo Completo:</b> Informe a data de vencimento, data de citação e data de pagamento/cálculo. O sistema aplica SELIC na fase extrajudicial e 1% a.m. na fase judicial automaticamente.
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Data de vencimento</label>
+        <input type="date" id="dataVenc">
+      </div>
+      <div class="field" id="wrap-citacao">
+        <label>Data de citação</label>
+        <input type="date" id="dataCitacao">
+      </div>
+      <div class="field">
+        <label>Data de cálculo (até)</label>
+        <input type="date" id="dataCalculo">
+      </div>
+      <div class="field">
+        <label>Multa (%)</label>
+        <input type="number" id="multa" value="10" step="0.01" min="0" max="100">
+      </div>
+      <div class="field full">
+        <label>Processo / Referência (opcional)</label>
+        <input type="text" id="processo" placeholder="Ex: Processo nº 0001234-56.2024.8.05.0001">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Valores Devidos</div>
+    <div id="parcelas-container"></div>
+    <button class="btn-add" onclick="addParcela()">+ Adicionar parcela</button>
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
+      <button class="calcular" id="btnCalc" onclick="calcular()">CALCULAR</button>
+      <button class="limpar" onclick="limparTudo()">LIMPAR</button>
+    </div>
+    <div class="loading" id="loading"><div class="spinner"></div><span id="loading-txt">Buscando índices...</span></div>
+  </div>
+
+  <div class="erro" id="erro"></div>
+
+  <div class="resultado" id="resultado">
+    <div class="resultado-titulo" id="res-titulo">Resultado — Lei 14.905/24</div>
+
+    <div class="fases-resultado" id="fases-resultado"></div>
+
+    <div class="totais-grid">
+      <div class="res-item"><label>Principal total</label><div class="valor sec" id="res-principal">—</div></div>
+      <div class="res-item"><label>Correção IPCA</label><div class="valor" id="res-correcao">—</div></div>
+      <div class="res-item"><label>Juros (SELIC + 1%)</label><div class="valor" id="res-juros">—</div></div>
+      <div class="res-item"><label>Multa</label><div class="valor" id="res-multa">—</div></div>
+      <div class="res-item"><label>Data de cálculo</label><div class="valor sec" id="res-data">—</div></div>
+      <div class="res-item"><label>Fase aplicada</label><div class="valor sec" id="res-fase">—</div></div>
+    </div>
+    <hr class="divider">
+    <div class="res-item" style="text-align:center;margin-bottom:16px">
+      <label style="text-align:center">💰 Total atualizado (Lei 14.905/24)</label>
+      <div class="valor grande" id="res-total">—</div>
+    </div>
+
+    <details class="tabela-wrap">
+      <summary>Ver planilha detalhada por parcela</summary>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th style="text-align:left">Vencimento</th>
+            <th>Principal</th>
+            <th>IPCA %</th>
+            <th>Val. corrigido</th>
+            <th>Juros extrajud.</th>
+            <th>Juros judicial</th>
+            <th>Multa</th>
+            <th>Total parcela</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-body"></tbody>
+      </table>
+    </details>
+
+    <p class="aviso">⚠️ Cálculo baseado na Lei 14.905/24 vigente a partir de 01/01/2025. SELIC utilizada como estimativa para juros extrajudiciais (taxa anual do BCB). Para execuções, confirme a taxa SELIC acumulada exata no período. Esta ferramenta não substitui análise jurídica especializada.</p>
+  </div>
+
+</div>
+
+<script>
+let faseAtual = 'completo';
+let numParcelas = 0;
+
+// SELIC estimada anual atual (mai/2026) — em produção buscar do BCB
+const SELIC_ANUAL = 0.105; // 10,5% a.a.
+const SELIC_MENSAL = Math.pow(1 + SELIC_ANUAL, 1/12) - 1;
+const JUROS_JUDICIAL_MES = 0.01; // 1% a.m.
+
+const infoFases = {
+  completo: '<b>Cálculo Completo:</b> Informe a data de vencimento, data de citação e data de pagamento/cálculo. O sistema aplica SELIC na fase extrajudicial e 1% a.m. na fase judicial automaticamente.',
+  extrajudicial: '<b>Fase Extrajudicial:</b> Do vencimento até a citação. Aplica IPCA + SELIC acumulada. A multa não incide nesta fase.',
+  judicial: '<b>Fase Judicial:</b> Da citação até o pagamento. Aplica IPCA + 1% ao mês (simples) + multa.',
+  execucao: '<b>Fase de Execução:</b> Após sentença transitada em julgado. IPCA + SELIC + 1% a.m. + multa de 10% (art. 523 CPC).',
+};
+
+function setFase(f) {
+  faseAtual = f;
+  ['completo','extrajudicial','judicial','execucao'].forEach(x => {
+    document.getElementById(`fase-${x}`).classList.toggle('ativo', x === f);
+  });
+  document.getElementById('info-fase').innerHTML = infoFases[f];
+  document.getElementById('wrap-citacao').style.opacity = (f === 'extrajudicial' || f === 'completo') ? '1' : '0.4';
+}
+
+function fmtMoeda(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtPct(v) { return (v >= 0 ? '+' : '') + v.toFixed(4).replace('.', ',') + '%'; }
+function fmtData(d) { return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+
+function showErro(msg) {
+  document.getElementById('erro').textContent = msg;
+  document.getElementById('erro').classList.add('visible');
+  document.getElementById('resultado').classList.remove('visible');
+}
+function hideErro() { document.getElementById('erro').classList.remove('visible'); }
+
+function addParcela(valor='', data='') {
+  numParcelas++;
+  const id = numParcelas;
+  const div = document.createElement('div');
+  div.className = 'parcela-row';
+  div.id = `parcela-${id}`;
+  div.innerHTML = `
+    <div class="num-badge">${id}</div>
+    <div class="field"><label>Vencimento</label><input type="date" id="parc-data-${id}" value="${data}"></div>
+    <div class="field"><label>Valor R$</label><input type="number" id="parc-valor-${id}" placeholder="0,00" step="0.01" min="0" value="${valor}"></div>
+    <button class="btn-rem" onclick="remParcela(${id})">✕</button>`;
+  document.getElementById('parcelas-container').appendChild(div);
+}
+
+function remParcela(id) {
+  const el = document.getElementById(`parcela-${id}`);
+  if (el) el.remove();
+  if (document.querySelectorAll('.parcela-row').length === 0) addParcela();
+}
+
+function limparTudo() {
+  document.getElementById('parcelas-container').innerHTML = '';
+  numParcelas = 0;
+  addParcela();
+  document.getElementById('resultado').classList.remove('visible');
+  hideErro();
+}
+
+async function fetchIPCA(dtIni, dtFim) {
+  const fmt = d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  const url = `https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=${fmt(dtIni)}&dataFinal=${fmt(dtFim)}`;
+  const proxies = [
+    async () => { const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`); if(!r.ok) throw 0; const j=await r.json(); return j.contents?JSON.parse(j.contents):j; },
+    async () => { const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`); if(!r.ok) throw 0; const j=await r.json(); return j.contents?JSON.parse(j.contents):j; },
+  ];
+  for (const fn of proxies) {
+    try { const d = await fn(); if(Array.isArray(d)&&d.length>0) return d; } catch(_) {}
+  }
+  return [];
+}
+
+function calcFator(dados) {
+  let f = 1;
+  dados.forEach(d => { f *= (1 + parseFloat(d.valor.replace(',','.')) / 100); });
+  return f;
+}
+
+function mesesEntre(d1, d2) {
+  return Math.max(0, (d2.getFullYear()-d1.getFullYear())*12 + (d2.getMonth()-d1.getMonth()) + (d2.getDate()-d1.getDate())/30);
+}
+
+async function calcular() {
+  hideErro();
+
+  const rows = document.querySelectorAll('.parcela-row');
+  const parcelas = [];
+  for (const row of rows) {
+    const id = row.id.replace('parcela-','');
+    const dataStr = document.getElementById(`parc-data-${id}`).value;
+    const valor = parseFloat(document.getElementById(`parc-valor-${id}`).value);
+    if (dataStr && valor > 0) parcelas.push({ data: new Date(dataStr+'T12:00:00'), valor });
+  }
+  if (parcelas.length === 0) return showErro('Adicione ao menos uma parcela válida.');
+
+  const dataVencStr = document.getElementById('dataVenc').value;
+  const dataCitacaoStr = document.getElementById('dataCitacao').value;
+  const dataCalcStr = document.getElementById('dataCalculo').value;
+  if (!dataVencStr || !dataCalcStr) return showErro('Informe as datas de vencimento e cálculo.');
+
+  const dataVenc = new Date(dataVencStr+'T12:00:00');
+  const dataCalc = new Date(dataCalcStr+'T12:00:00');
+  const dataCitacao = dataCitacaoStr ? new Date(dataCitacaoStr+'T12:00:00') : null;
+  const multa = parseFloat(document.getElementById('multa').value) || 0;
+  const processo = document.getElementById('processo').value;
+
+  if (dataCalc <= dataVenc) return showErro('A data de cálculo deve ser posterior ao vencimento.');
+
+  const btn = document.getElementById('btnCalc');
+  const loading = document.getElementById('loading');
+  btn.disabled = true;
+  loading.classList.add('visible');
+
+  try {
+    let totalPrincipal=0, totalCorrecao=0, totalJurosExtraj=0, totalJurosJudicial=0, totalMulta=0;
+    const linhas = [];
+
+    for (let i=0; i<parcelas.length; i++) {
+      const p = parcelas[i];
+      document.getElementById('loading-txt').textContent = `Buscando IPCA: parcela ${i+1} de ${parcelas.length}...`;
+
+      const dadosIPCA = await fetchIPCA(p.data, dataCalc);
+      const fatorIPCA = dadosIPCA.length > 0 ? calcFator(dadosIPCA) : 1;
+      const valorCorrigido = p.valor * fatorIPCA;
+      const pctIPCA = (fatorIPCA-1)*100;
+
+      // Juros extrajudiciais (SELIC): do vencimento à citação
+      let jurosExtraj = 0;
+      let mesesExtraj = 0;
+      if (faseAtual === 'completo' || faseAtual === 'extrajudicial') {
+        const fimExtraj = dataCitacao && dataCitacao < dataCalc ? dataCitacao : dataCalc;
+        mesesExtraj = mesesEntre(p.data, fimExtraj);
+        jurosExtraj = valorCorrigido * (Math.pow(1+SELIC_MENSAL, mesesExtraj) - 1);
+      }
+
+      // Juros judiciais (1% a.m. simples): da citação ao cálculo
+      let jurosJudicial = 0;
+      let mesesJudicial = 0;
+      if ((faseAtual === 'completo' || faseAtual === 'judicial' || faseAtual === 'execucao') && dataCitacao) {
+        mesesJudicial = mesesEntre(dataCitacao, dataCalc);
+        jurosJudicial = valorCorrigido * JUROS_JUDICIAL_MES * mesesJudicial;
+      }
+
+      const multaValor = faseAtual !== 'extrajudicial' ? p.valor * multa / 100 : 0;
+      const totalParcela = valorCorrigido + jurosExtraj + jurosJudicial + multaValor;
+
+      totalPrincipal += p.valor;
+      totalCorrecao += (valorCorrigido - p.valor);
+      totalJurosExtraj += jurosExtraj;
+      totalJurosJudicial += jurosJudicial;
+      totalMulta += multaValor;
+
+      linhas.push({ venc: p.data, principal: p.valor, pctIPCA, valorCorrigido, jurosExtraj, jurosJudicial, multaValor, totalParcela });
+    }
+
+    const totalGeral = totalPrincipal + totalCorrecao + totalJurosExtraj + totalJurosJudicial + totalMulta;
+    const nomeFases = { completo: 'Completo (Extrajud. + Judicial)', extrajudicial: 'Extrajudicial', judicial: 'Judicial', execucao: 'Execução' };
+
+    document.getElementById('res-titulo').textContent = 'Débito Atualizado — Lei 14.905/24' + (processo ? ` — ${processo}` : '');
+    document.getElementById('res-principal').textContent = fmtMoeda(totalPrincipal);
+    document.getElementById('res-correcao').textContent = fmtMoeda(totalCorrecao);
+    document.getElementById('res-juros').textContent = fmtMoeda(totalJurosExtraj + totalJurosJudicial);
+    document.getElementById('res-multa').textContent = fmtMoeda(totalMulta);
+    document.getElementById('res-data').textContent = fmtData(dataCalc);
+    document.getElementById('res-fase').textContent = nomeFases[faseAtual];
+    document.getElementById('res-total').textContent = fmtMoeda(totalGeral);
+
+    // Cards de fases
+    const fasesRes = document.getElementById('fases-resultado');
+    fasesRes.innerHTML = '';
+    if (faseAtual === 'completo' || faseAtual === 'extrajudicial') {
+      const c = document.createElement('div');
+      c.className = 'fase-res';
+      c.innerHTML = `<div class="fr-titulo">Fase Extrajudicial</div>
+        <div class="fr-item"><span>Juros SELIC</span><span>${fmtMoeda(totalJurosExtraj)}</span></div>
+        <div class="fr-item"><span>Taxa SELIC est.</span><span>${(SELIC_ANUAL*100).toFixed(1)}% a.a.</span></div>`;
+      fasesRes.appendChild(c);
+    }
+    if (faseAtual === 'completo' || faseAtual === 'judicial' || faseAtual === 'execucao') {
+      const c = document.createElement('div');
+      c.className = 'fase-res';
+      c.innerHTML = `<div class="fr-titulo">Fase Judicial</div>
+        <div class="fr-item"><span>Juros 1% a.m.</span><span>${fmtMoeda(totalJurosJudicial)}</span></div>
+        <div class="fr-item"><span>Multa</span><span>${fmtMoeda(totalMulta)}</span></div>`;
+      fasesRes.appendChild(c);
+    }
+
+    // Tabela
+    const tbody = document.getElementById('tabela-body');
+    tbody.innerHTML = '';
+    linhas.forEach((l,i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td style="text-align:left;font-family:inherit;color:#666">${fmtData(l.venc)}</td>
+        <td>${fmtMoeda(l.principal)}</td>
+        <td>${fmtPct(l.pctIPCA)}</td>
+        <td>${fmtMoeda(l.valorCorrigido)}</td>
+        <td>${fmtMoeda(l.jurosExtraj)}</td>
+        <td>${fmtMoeda(l.jurosJudicial)}</td>
+        <td>${fmtMoeda(l.multaValor)}</td>
+        <td class="dest">${fmtMoeda(l.totalParcela)}</td>`;
+      tbody.appendChild(tr);
+    });
+    const trT = document.createElement('tr');
+    trT.className = 'total-row';
+    trT.innerHTML = `
+      <td colspan="2">TOTAL</td>
+      <td>${fmtMoeda(totalPrincipal)}</td>
+      <td>—</td>
+      <td>${fmtMoeda(totalPrincipal+totalCorrecao)}</td>
+      <td>${fmtMoeda(totalJurosExtraj)}</td>
+      <td>${fmtMoeda(totalJurosJudicial)}</td>
+      <td>${fmtMoeda(totalMulta)}</td>
+      <td class="dest">${fmtMoeda(totalGeral)}</td>`;
+    tbody.appendChild(trT);
+
+    document.getElementById('resultado').classList.add('visible');
+
+  } catch(e) {
+    showErro(e.message || 'Erro ao calcular. Tente novamente.');
+  } finally {
+    btn.disabled = false;
+    loading.classList.remove('visible');
+    document.getElementById('loading-txt').textContent = 'Buscando índices...';
+  }
+}
+
+// Init
+const hoje = new Date();
+document.getElementById('dataCalculo').value = hoje.toISOString().split('T')[0];
+document.getElementById('dataVenc').value = new Date(hoje.getFullYear()-1, hoje.getMonth(), 1).toISOString().split('T')[0];
+document.getElementById('dataCitacao').value = new Date(hoje.getFullYear(), hoje.getMonth()-6, 1).toISOString().split('T')[0];
+addParcela('10000', new Date(hoje.getFullYear()-1, hoje.getMonth(), 1).toISOString().split('T')[0]);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const f = document.activeElement;
+    if (f && (f.tagName==='INPUT'||f.tagName==='SELECT')) calcular();
+  }
+});
+</script>
+</body>
+</html>
